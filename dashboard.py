@@ -27,8 +27,13 @@ st.caption("Industry-Oriented Fleet Monitoring Dashboard")
 # --------------------------------
 
 try:
+    import os
+    csv_file = "data/sample_vehicle_log.csv"
 
-    df = pd.read_csv("data/vehicle_log.csv")
+    if os.path.exists("data/vehicle_log.csv"):
+     csv_file = "data/vehicle_log.csv"
+
+    df = pd.read_csv(csv_file)
 
     if len(df) == 0:
         st.warning("No vehicle data available.")
