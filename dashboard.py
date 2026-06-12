@@ -1,75 +1,124 @@
 import streamlit as st
 import pandas as pd
 import folium
+import os
+
 from streamlit_folium import st_folium
 from datetime import datetime
 from streamlit_autorefresh import st_autorefresh
+
+# =====================================
+# AUTO REFRESH
+# =====================================
 
 st_autorefresh(
     interval=5000,
     key="vehicle_dashboard"
 )
+
+# =====================================
+# PAGE CONFIG
+# =====================================
+
 st.set_page_config(
     page_title="Vehicle Tracking Dashboard",
     page_icon="🚗",
     layout="wide"
 )
 
-# --------------------------------
+# =====================================
 # HEADER
-# --------------------------------
+# =====================================
 
 st.title("🚗 IoT Vehicle Tracking & Theft Prevention System")
 st.caption("Industry-Oriented Fleet Monitoring Dashboard")
 
-# --------------------------------
+# =====================================
 # LOAD DATA
-# --------------------------------
+# =====================================
 
 try:
-    import os
+
+    csv_file = None
+
     if os.path.exists("data/vehicle_log.csv"):
-      df = pd.read_csv("data/vehicle_log.csv")
+        csv_file = "data/vehicle_log.csv"
 
     elif os.path.exists("data/sample_vehicle_log.csv"):
-     df = pd.read_csv("data/sample_vehicle_log.csv")
+        csv_file = "data/sample_vehicle_log.csv"
+
+    # If no file exists create demo data
+    if csv_file is None:
+
+        df = pd.DataFrame({
+            "timestamp": [
+                "2025-06-12 10:00:00",
+                "2025-06-12 10:01:00",
+                "2025-06-12 10:02:00"
+            ],
+            "latitude": [
+                12.9716,
+                12.9720,
+                12.9730
+            ],
+            "longitude": [
+                77.5946,
+                77.5950,
+                77.5960
+            ],
+            "status": [
+                "MOVING",
+                "MOVING",
+                "MOVING"
+            ],
+            "alert": [
+                "NONE",
+                "NONE",
+                "NONE"
+            ]
+        })
+
+    else:
+
+        df = pd.read_csv(csv_file)
 
     if len(df) == 0:
+
         st.warning("No vehicle data available.")
         st.stop()
 
     latest = df.iloc[-1]
 
-    latitude = latest["latitude"]
-    longitude = latest["longitude"]
-    status = latest["status"]
-    alert = latest["alert"]
+    latitude = float(latest["latitude"])
+    longitude = float(latest["longitude"])
+    status = str(latest["status"])
+    alert = str(latest["alert"])
 
     speed = 35
 
-    # --------------------------------
+    # =====================================
     # SIDEBAR
-    # --------------------------------
+    # =====================================
 
     st.sidebar.title("Vehicle Details")
 
     st.sidebar.info(
         """
-        Vehicle ID : VH001
-        
-        Driver : Demo Driver
-        
-        Mode : Simulation
-        
-        Status : Active
-        """
+Vehicle ID : VH001
+
+Driver : Demo Driver
+
+Mode : Simulation
+
+Status : Active
+"""
     )
 
     st.sidebar.success("System Online")
 
-    # --------------------------------
+    # =====================================
     # KPI CARDS
-    # --------------------------------
+    # =====================================
 
     col1, col2, col3, col4, col5 = st.columns(5)
 
@@ -104,9 +153,9 @@ try:
 
     st.divider()
 
-    # --------------------------------
-    # LIVE MAP
-    # --------------------------------
+    # =====================================
+    # MAP
+    # =====================================
 
     st.subheader("📍 Live Vehicle Location")
 
@@ -127,9 +176,7 @@ try:
         height=500
     )
 
-    maps_url = (
-        f"https://maps.google.com/?q={latitude},{longitude}"
-    )
+    maps_url = f"https://maps.google.com/?q={latitude},{longitude}"
 
     st.link_button(
         "🗺 Open in Google Maps",
@@ -138,39 +185,33 @@ try:
 
     st.divider()
 
-    # --------------------------------
+    # =====================================
     # CHARTS
-    # --------------------------------
+    # =====================================
 
-    c1, c2 = st.columns(2)
+    colA, colB = st.columns(2)
 
-    with c1:
+    with colA:
 
         st.subheader("🚨 Alert Statistics")
 
-        alert_stats = (
-            df["alert"]
-            .value_counts()
-        )
+        alert_stats = df["alert"].value_counts()
 
         st.bar_chart(alert_stats)
 
-    with c2:
+    with colB:
 
         st.subheader("🚗 Vehicle Status")
 
-        status_stats = (
-            df["status"]
-            .value_counts()
-        )
+        status_stats = df["status"].value_counts()
 
         st.bar_chart(status_stats)
 
     st.divider()
 
-    # --------------------------------
-    # HISTORY TABLE
-    # --------------------------------
+    # =====================================
+    # HISTORY
+    # =====================================
 
     st.subheader("📊 Vehicle History")
 
@@ -181,15 +222,13 @@ try:
 
     st.divider()
 
-    # --------------------------------
+    # =====================================
     # ALERT HISTORY
-    # --------------------------------
+    # =====================================
 
     st.subheader("🚨 Recent Alerts")
 
-    alerts = df[
-        df["alert"] != "NONE"
-    ]
+    alerts = df[df["alert"] != "NONE"]
 
     if len(alerts) > 0:
 
@@ -200,15 +239,13 @@ try:
 
     else:
 
-        st.success(
-            "No alerts detected."
-        )
+        st.success("No alerts detected.")
 
     st.divider()
 
-    # --------------------------------
+    # =====================================
     # FOOTER
-    # --------------------------------
+    # =====================================
 
     st.caption(
         f"Last Updated : {datetime.now()}"
