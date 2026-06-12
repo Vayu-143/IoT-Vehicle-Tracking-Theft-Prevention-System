@@ -33,7 +33,6 @@ try:
 
     elif os.path.exists("data/sample_vehicle_log.csv"):
      df = pd.read_csv("data/sample_vehicle_log.csv")
-    df = pd.read_csv(csv_file)
 
     if len(df) == 0:
         st.warning("No vehicle data available.")
