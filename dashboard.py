@@ -33,64 +33,23 @@ st_autorefresh(
 st.title("🚗 IoT Vehicle Tracking & Theft Prevention System")
 st.caption("Industry-Oriented Fleet Monitoring Dashboard")
 
-# =====================================
-# LOAD VEHICLE DATA
-# =====================================
-
 try:
 
-    csv_file = None
+    # =====================================
+    # LOAD LIVE CSV ONLY
+    # =====================================
 
-    if os.path.exists("data/vehicle_log.csv"):
-        csv_file = "data/vehicle_log.csv"
+    csv_file = "data/vehicle_log.csv"
 
-    elif os.path.exists("data/sample_vehicle_log.csv"):
-        csv_file = "data/sample_vehicle_log.csv"
-
-    # Demo Data if file not found
-
-    if csv_file is None:
-
-        df = pd.DataFrame({
-            "timestamp": [
-                "2025-06-12 10:00:00",
-                "2025-06-12 10:01:00",
-                "2025-06-12 10:02:00"
-            ],
-            "latitude": [
-                12.9716,
-                12.9720,
-                12.9730
-            ],
-            "longitude": [
-                77.5946,
-                77.5950,
-                77.5960
-            ],
-            "status": [
-                "MOVING",
-                "MOVING",
-                "MOVING"
-            ],
-            "alert": [
-                "NONE",
-                "NONE",
-                "NONE"
-            ]
-        })
-
-    else:
-
-        df = pd.read_csv(csv_file)
-
-    if len(df) == 0:
-
-        st.warning("No vehicle data available.")
+    if not os.path.exists(csv_file):
+        st.error("vehicle_log.csv not found")
         st.stop()
 
-    # =====================================
-    # LATEST DATA
-    # =====================================
+    df = pd.read_csv(csv_file)
+
+    if df.empty:
+        st.warning("No vehicle data available.")
+        st.stop()
 
     latest = df.iloc[-1]
 
@@ -110,20 +69,11 @@ try:
     c1, c2, c3, c4 = st.columns(4)
 
     with c1:
-
-        if st.button(
-            "🔄 Refresh Dashboard",
-            use_container_width=True
-        ):
-
+        if st.button("🔄 Refresh Dashboard", use_container_width=True):
             st.rerun()
 
     with c2:
-
-        if st.button(
-            "🗑 Clear History",
-            use_container_width=True
-        ):
+        if st.button("🗑 Clear History", use_container_width=True):
 
             empty_df = pd.DataFrame(
                 columns=[
@@ -135,21 +85,14 @@ try:
                 ]
             )
 
-            os.makedirs("data", exist_ok=True)
+            empty_df.to_csv(csv_file, index=False)
 
-            empty_df.to_csv(
-                "data/vehicle_log.csv",
-                index=False
-            )
-
-            st.success("History Cleared Successfully")
-
+            st.success("History Cleared")
             st.rerun()
 
     with c3:
-
         st.download_button(
-            label="📥 Download CSV",
+            "📥 Download CSV",
             data=df.to_csv(index=False),
             file_name="vehicle_log.csv",
             mime="text/csv",
@@ -157,7 +100,6 @@ try:
         )
 
     with c4:
-
         st.info("Auto Refresh: 5 sec")
 
     st.divider()
@@ -183,41 +125,29 @@ Status : Active
     st.sidebar.success("🟢 System Online")
 
     # =====================================
+    # DEBUG INFO
+    # =====================================
+
+    st.success(
+        f"Latest Record Time : {latest['timestamp']}"
+    )
+
+    # =====================================
     # KPI CARDS
     # =====================================
 
     k1, k2, k3, k4, k5 = st.columns(5)
 
-    k1.metric(
-        "Latitude",
-        round(latitude, 6)
-    )
-
-    k2.metric(
-        "Longitude",
-        round(longitude, 6)
-    )
-
-    k3.metric(
-        "Speed",
-        f"{speed} km/h"
-    )
-
-    k4.metric(
-        "Status",
-        status
-    )
+    k1.metric("Latitude", round(latitude, 6))
+    k2.metric("Longitude", round(longitude, 6))
+    k3.metric("Speed", f"{speed} km/h")
+    k4.metric("Status", status)
 
     if alert == "THEFT ALERT":
-
         k5.error(alert)
-
     elif alert == "GEOFENCE ALERT":
-
         k5.warning(alert)
-
     else:
-
         k5.success(alert)
 
     st.divider()
@@ -245,13 +175,9 @@ Status : Active
         height=500
     )
 
-    maps_url = (
-        f"https://www.google.com/maps?q={latitude},{longitude}"
-    )
-
     st.link_button(
         "🗺 Open in Google Maps",
-        maps_url
+        f"https://www.google.com/maps?q={latitude},{longitude}"
     )
 
     st.divider()
@@ -263,26 +189,12 @@ Status : Active
     chart1, chart2 = st.columns(2)
 
     with chart1:
-
         st.subheader("🚨 Alert Statistics")
-
-        alert_stats = (
-            df["alert"]
-            .value_counts()
-        )
-
-        st.bar_chart(alert_stats)
+        st.bar_chart(df["alert"].value_counts())
 
     with chart2:
-
         st.subheader("🚗 Vehicle Status Statistics")
-
-        status_stats = (
-            df["status"]
-            .value_counts()
-        )
-
-        st.bar_chart(status_stats)
+        st.bar_chart(df["status"].value_counts())
 
     st.divider()
 
@@ -305,22 +217,15 @@ Status : Active
 
     st.subheader("🚨 Recent Alerts")
 
-    alerts = df[
-        df["alert"] != "NONE"
-    ]
+    alerts = df[df["alert"] != "NONE"]
 
     if len(alerts) > 0:
-
         st.dataframe(
             alerts.tail(20),
             use_container_width=True
         )
-
     else:
-
-        st.success(
-            "No alerts detected."
-        )
+        st.success("No alerts detected.")
 
     st.divider()
 
@@ -329,11 +234,9 @@ Status : Active
     # =====================================
 
     st.caption(
-        f"Last Updated : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+        f"Dashboard Updated : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
     )
 
 except Exception as e:
 
-    st.error(
-        f"Dashboard Error: {e}"
-    )
+    st.error(f"Dashboard Error: {e}")
