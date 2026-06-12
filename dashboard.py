@@ -1,15 +1,18 @@
 import streamlit as st
 import pandas as pd
+import requests
 import folium
-import os
 
-from streamlit_folium import st_folium
 from datetime import datetime
+from streamlit_folium import st_folium
 from streamlit_autorefresh import st_autorefresh
 
-# =====================================
-# PAGE CONFIG
-# =====================================
+# ==================================
+# CONFIG
+# ==================================
+
+CHANNEL_ID = "3406688"
+READ_API_KEY = "LFWHS731QBFW62KQ"
 
 st.set_page_config(
     page_title="IoT Vehicle Tracking Dashboard",
@@ -17,192 +20,267 @@ st.set_page_config(
     layout="wide"
 )
 
-# =====================================
-# AUTO REFRESH EVERY 5 SEC
-# =====================================
+# ==================================
+# AUTO REFRESH
+# ==================================
 
 st_autorefresh(
     interval=5000,
-    key="vehicle_dashboard"
+    key="dashboard_refresh"
 )
 
-# =====================================
+# ==================================
 # HEADER
-# =====================================
+# ==================================
 
-st.title("🚗 IoT Vehicle Tracking & Theft Prevention System")
-st.caption("Industry-Oriented Fleet Monitoring Dashboard")
+st.title(
+    "🚗 IoT Vehicle Tracking & Theft Prevention System"
+)
+
+st.caption(
+    "Industry-Oriented Fleet Monitoring Dashboard"
+)
 
 try:
 
-    # =====================================
-    # LOAD LIVE CSV ONLY
-    # =====================================
+    # ==================================
+    # GET THINGSPEAK DATA
+    # ==================================
 
-    csv_file = "data/vehicle_log.csv"
+    url = (
+        f"https://api.thingspeak.com/channels/"
+        f"{CHANNEL_ID}/feeds.json"
+        f"?api_key={READ_API_KEY}"
+        f"&results=50"
+    )
 
-    if not os.path.exists(csv_file):
-        st.error("vehicle_log.csv not found")
+    response = requests.get(
+        url,
+        timeout=10
+    )
+
+    data = response.json()
+
+    feeds = data["feeds"]
+
+    if len(feeds) == 0:
+        st.warning(
+            "No data received from ThingSpeak."
+        )
         st.stop()
 
-    df = pd.read_csv(csv_file)
+    rows = []
 
-    if df.empty:
-        st.warning("No vehicle data available.")
-        st.stop()
+    for row in feeds:
+
+        rows.append({
+
+            "timestamp":
+                row["created_at"],
+
+            "latitude":
+                row["field1"],
+
+            "longitude":
+                row["field2"],
+
+            "status":
+                row["field3"],
+
+            "alert":
+                row["field4"],
+
+            "speed":
+                row["field5"]
+
+        })
+
+    df = pd.DataFrame(rows)
+
+    df["latitude"] = pd.to_numeric(
+        df["latitude"],
+        errors="coerce"
+    )
+
+    df["longitude"] = pd.to_numeric(
+        df["longitude"],
+        errors="coerce"
+    )
+
+    df["speed"] = pd.to_numeric(
+        df["speed"],
+        errors="coerce"
+    )
+
+    df = df.dropna()
 
     latest = df.iloc[-1]
 
-    latitude = float(latest["latitude"])
-    longitude = float(latest["longitude"])
-    status = str(latest["status"])
-    alert = str(latest["alert"])
+    latitude = float(
+        latest["latitude"]
+    )
 
-    speed = 35
+    longitude = float(
+        latest["longitude"]
+    )
 
-    # =====================================
-    # DASHBOARD CONTROLS
-    # =====================================
+    speed = int(
+        latest["speed"]
+    )
 
-    st.subheader("⚙ Dashboard Controls")
+    status = str(
+        latest["status"]
+    )
 
-    c1, c2, c3, c4 = st.columns(4)
+    alert = str(
+        latest["alert"]
+    )
 
-    with c1:
-        if st.button("🔄 Refresh Dashboard", use_container_width=True):
-            st.rerun()
-
-    with c2:
-        if st.button("🗑 Clear History", use_container_width=True):
-
-            empty_df = pd.DataFrame(
-                columns=[
-                    "timestamp",
-                    "latitude",
-                    "longitude",
-                    "status",
-                    "alert"
-                ]
-            )
-
-            empty_df.to_csv(csv_file, index=False)
-
-            st.success("History Cleared")
-            st.rerun()
-
-    with c3:
-        st.download_button(
-            "📥 Download CSV",
-            data=df.to_csv(index=False),
-            file_name="vehicle_log.csv",
-            mime="text/csv",
-            use_container_width=True
-        )
-
-    with c4:
-        st.info("Auto Refresh: 5 sec")
-
-    st.divider()
-
-    # =====================================
+    # ==================================
     # SIDEBAR
-    # =====================================
+    # ==================================
 
-    st.sidebar.title("Vehicle Details")
+    st.sidebar.title(
+        "Vehicle Details"
+    )
 
     st.sidebar.info(
-        """
+        f"""
 Vehicle ID : VH001
 
 Driver : Demo Driver
 
-Mode : Simulation
+Mode : ThingSpeak Live
 
 Status : Active
 """
     )
 
-    st.sidebar.success("🟢 System Online")
+    st.sidebar.success(
+        "🟢 ThingSpeak Connected"
+    )
 
-    # =====================================
-    # DEBUG INFO
-    # =====================================
+    # ==================================
+    # DASHBOARD STATUS
+    # ==================================
 
     st.success(
         f"Latest Record Time : {latest['timestamp']}"
     )
 
-    # =====================================
+    # ==================================
     # KPI CARDS
-    # =====================================
+    # ==================================
 
-    k1, k2, k3, k4, k5 = st.columns(5)
+    c1, c2, c3, c4, c5 = st.columns(5)
 
-    k1.metric("Latitude", round(latitude, 6))
-    k2.metric("Longitude", round(longitude, 6))
-    k3.metric("Speed", f"{speed} km/h")
-    k4.metric("Status", status)
+    c1.metric(
+        "Latitude",
+        round(latitude, 6)
+    )
+
+    c2.metric(
+        "Longitude",
+        round(longitude, 6)
+    )
+
+    c3.metric(
+        "Speed",
+        f"{speed} km/h"
+    )
+
+    c4.metric(
+        "Status",
+        status
+    )
 
     if alert == "THEFT ALERT":
-        k5.error(alert)
+
+        c5.error(alert)
+
     elif alert == "GEOFENCE ALERT":
-        k5.warning(alert)
+
+        c5.warning(alert)
+
     else:
-        k5.success(alert)
+
+        c5.success(alert)
 
     st.divider()
 
-    # =====================================
+    # ==================================
     # LIVE MAP
-    # =====================================
+    # ==================================
 
-    st.subheader("📍 Live Vehicle Location")
+    st.subheader(
+        "📍 Live Vehicle Location"
+    )
 
-    vehicle_map = folium.Map(
-        location=[latitude, longitude],
+    fmap = folium.Map(
+        location=[
+            latitude,
+            longitude
+        ],
         zoom_start=15
     )
 
     folium.Marker(
-        [latitude, longitude],
-        popup="Vehicle Position",
-        tooltip="Vehicle"
-    ).add_to(vehicle_map)
+        [
+            latitude,
+            longitude
+        ],
+        popup="Vehicle",
+        tooltip="Live Vehicle"
+    ).add_to(fmap)
 
     st_folium(
-        vehicle_map,
-        width=1200,
+        fmap,
+        width=None,
         height=500
     )
 
     st.link_button(
-        "🗺 Open in Google Maps",
+        "🗺 Open In Google Maps",
         f"https://www.google.com/maps?q={latitude},{longitude}"
     )
 
     st.divider()
 
-    # =====================================
+    # ==================================
     # CHARTS
-    # =====================================
+    # ==================================
 
-    chart1, chart2 = st.columns(2)
+    col1, col2 = st.columns(2)
 
-    with chart1:
-        st.subheader("🚨 Alert Statistics")
-        st.bar_chart(df["alert"].value_counts())
+    with col1:
 
-    with chart2:
-        st.subheader("🚗 Vehicle Status Statistics")
-        st.bar_chart(df["status"].value_counts())
+        st.subheader(
+            "🚨 Alert Statistics"
+        )
+
+        st.bar_chart(
+            df["alert"].value_counts()
+        )
+
+    with col2:
+
+        st.subheader(
+            "🚗 Status Statistics"
+        )
+
+        st.bar_chart(
+            df["status"].value_counts()
+        )
 
     st.divider()
 
-    # =====================================
-    # VEHICLE HISTORY
-    # =====================================
+    # ==================================
+    # HISTORY
+    # ==================================
 
-    st.subheader("📊 Vehicle History")
+    st.subheader(
+        "📊 Vehicle History"
+    )
 
     st.dataframe(
         df.tail(50),
@@ -211,32 +289,40 @@ Status : Active
 
     st.divider()
 
-    # =====================================
+    # ==================================
     # ALERT HISTORY
-    # =====================================
+    # ==================================
 
-    st.subheader("🚨 Recent Alerts")
+    st.subheader(
+        "🚨 Recent Alerts"
+    )
 
-    alerts = df[df["alert"] != "NONE"]
+    alerts = df[
+        df["alert"] != "NONE"
+    ]
 
-    if len(alerts) > 0:
+    if len(alerts):
+
         st.dataframe(
             alerts.tail(20),
             use_container_width=True
         )
+
     else:
-        st.success("No alerts detected.")
+
+        st.success(
+            "No alerts detected."
+        )
 
     st.divider()
 
-    # =====================================
-    # FOOTER
-    # =====================================
-
     st.caption(
-        f"Dashboard Updated : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+        f"Dashboard Updated : "
+        f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
     )
 
 except Exception as e:
 
-    st.error(f"Dashboard Error: {e}")
+    st.error(
+        f"Dashboard Error : {e}"
+    )

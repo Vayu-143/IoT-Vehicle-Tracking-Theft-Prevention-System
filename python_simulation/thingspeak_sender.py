@@ -1,19 +1,19 @@
 import requests
 
-API_KEY = "YOUR_API_KEY_HERE"
+WRITE_API_KEY = "0IU6P7UH51NO8EHU"
 
 
 def update_thingspeak(
-        latitude,
-        longitude,
-        status,
-        alert,
-        speed):
-
+    latitude,
+    longitude,
+    status,
+    alert,
+    speed
+):
     url = "https://api.thingspeak.com/update"
 
     payload = {
-        "api_key": API_KEY,
+        "api_key": WRITE_API_KEY,
         "field1": latitude,
         "field2": longitude,
         "field3": status,
@@ -22,21 +22,17 @@ def update_thingspeak(
     }
 
     try:
-
-        response = requests.get(
+        response = requests.post(
             url,
-            params=payload,
+            data=payload,
             timeout=10
         )
 
         print(
-            "ThingSpeak Response:",
-            response.text
+            f"ThingSpeak Updated: {response.text}"
         )
 
     except Exception as e:
-
         print(
-            "ThingSpeak Error:",
-            e
+            f"ThingSpeak Error: {e}"
         )
