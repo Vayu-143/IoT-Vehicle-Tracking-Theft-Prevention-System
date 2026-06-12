@@ -2,7 +2,8 @@ venv/
 __pycache__/
 *.pyc
 
-data/
+data/*
+!data/vehicle_log.csv
 outputs/
 
 .env
