@@ -422,7 +422,7 @@ Live IoT data transmission and monitoring through the ThingSpeak Cloud Platform.
 
 ### Vayunandan Mishra
 
-B.Tech Student | Internet of Things (IoT)
+B.E Student | Internet of Things (IoT)
 
 Passionate about IoT Systems, Embedded Development, Cloud Computing, Data Analytics, and Real-Time Monitoring Solutions.
 
