@@ -2,14 +2,6 @@
 
 ### Real-Time Vehicle Monitoring, Geofencing & Theft Detection using IoT, GPS Simulation, ThingSpeak Cloud, and Streamlit Dashboard
 
-<p align="center">
-  <img src="images/dashboard_home.png" width="900">
-</p>
-
-<p align="center">
-Real-Time Vehicle Tracking • Geofencing • Theft Detection • ThingSpeak Cloud • Streamlit Dashboard
-</p>
-
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
 ![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-red)
 ![ThingSpeak](https://img.shields.io/badge/ThingSpeak-Cloud-orange)
