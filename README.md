@@ -2,6 +2,14 @@
 
 ### Real-Time Vehicle Monitoring, Geofencing & Theft Detection using IoT, GPS Simulation, ThingSpeak Cloud, and Streamlit Dashboard
 
+<p align="center">
+  <img src="images/dashboard_home.png" width="900">
+</p>
+
+<p align="center">
+Real-Time Vehicle Tracking • Geofencing • Theft Detection • ThingSpeak Cloud • Streamlit Dashboard
+</p>
+
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
 ![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-red)
 ![ThingSpeak](https://img.shields.io/badge/ThingSpeak-Cloud-orange)
@@ -12,17 +20,24 @@
 
 ## 📖 Overview
 
-The **IoT Vehicle Tracking & Theft Prevention System** is an industry-oriented IoT project designed to provide real-time vehicle monitoring, GPS location tracking, geofencing alerts, theft detection, cloud connectivity, and interactive dashboard visualization.
+The **IoT Vehicle Tracking & Theft Prevention System** is an industry-oriented IoT solution designed to provide:
 
-The system simulates vehicle movement, uploads live GPS coordinates to the ThingSpeak IoT Cloud platform, and visualizes the data through a professional Streamlit dashboard.
+* Real-time vehicle monitoring
+* GPS location tracking
+* Geofencing alerts
+* Theft detection
+* Cloud connectivity
+* Interactive dashboard visualization
 
-This project demonstrates how modern IoT technologies can be used to improve vehicle security, fleet management, and asset tracking.
+The system simulates vehicle movement, uploads GPS coordinates to the ThingSpeak IoT Cloud platform, and visualizes live data through a professional Streamlit dashboard.
+
+This project demonstrates how modern IoT technologies can be applied to vehicle security, fleet management, logistics tracking, and intelligent transportation systems.
 
 ---
 
 ## 🌐 Live Dashboard
 
-**Streamlit Dashboard**
+### Streamlit Cloud Deployment
 
 https://iot-vehicle-tracking-theft-prevention-system-632ddnbtrfpp2pxfh.streamlit.app/
 
@@ -34,49 +49,54 @@ https://github.com/Vayu-143/IoT-Vehicle-Tracking-Theft-Prevention-System
 
 ---
 
-## ✨ Features
+## ✨ Key Features
 
 ### 📍 Real-Time Vehicle Tracking
 
 * Live GPS coordinate monitoring
-* Dynamic vehicle location updates
-* Interactive map visualization
+* Dynamic location updates
+* Interactive vehicle tracking map
+* Google Maps integration
 
 ### 🚨 Theft Detection
 
-* Detects unauthorized vehicle movement
-* Generates theft alerts
-* Displays alert history
+* Unauthorized movement detection
+* Instant theft alerts
+* Alert history monitoring
 
 ### 🛰 Geofencing
 
-* Defines safe operating zones
-* Detects boundary violations
-* Generates geofence alerts
+* Safe zone boundary monitoring
+* Geofence breach detection
+* Automatic geofence alerts
 
 ### ☁ ThingSpeak Cloud Integration
 
-* Real-time IoT data upload
-* Cloud-based vehicle monitoring
+* Real-time IoT data transmission
+* Cloud-based monitoring
 * Historical data storage
 
 ### 📊 Professional Dashboard
 
-* Live vehicle status
-* Speed monitoring
-* Alert statistics
-* Vehicle history table
-* Google Maps integration
+* Live KPI cards
+* Interactive location map
+* Alert analytics
+* Vehicle history records
+* Real-time updates
 
 ### 📄 Automated Reporting
 
 * PDF report generation
-* Alert logging
-* Historical analysis
+* Vehicle activity logs
+* Alert summaries
 
 ---
 
 ## 🏗 System Architecture
+
+![Vehicle Tracking Architecture](circuit_diagram/vehicle_tracking_architecture.png)
+
+The system follows a cloud-connected IoT architecture where simulated GPS data is generated locally, transmitted to ThingSpeak Cloud, and visualized through a real-time Streamlit dashboard.
 
 ```text
 GPS Simulator
@@ -98,19 +118,19 @@ Real-Time Monitoring
 
 ## 🔧 Technology Stack
 
-### Programming Languages
+### Programming Language
 
-* Python
+* Python 3.12
 
 ### IoT Platform
 
 * ThingSpeak Cloud
 
-### Dashboard
+### Dashboard Framework
 
 * Streamlit
 
-### Mapping
+### Mapping & Visualization
 
 * Folium
 * Google Maps
@@ -123,7 +143,7 @@ Real-Time Monitoring
 
 * ReportLab
 
-### Visualization
+### Charts & Analytics
 
 * Streamlit Charts
 
@@ -137,6 +157,7 @@ IoT-Vehicle-Tracking-Theft-Prevention-System
 ├── arduino_code/
 │
 ├── circuit_diagram/
+│   └── vehicle_tracking_architecture.png
 │
 ├── dashboard/
 │
@@ -146,6 +167,11 @@ IoT-Vehicle-Tracking-Theft-Prevention-System
 ├── docs/
 │
 ├── images/
+│   ├── analytics.png
+│   ├── dashboard_home.png
+│   ├── live_map.png
+│   ├── thingspeak_dashboard.png
+│   └── vehicle_history.png
 │
 ├── outputs/
 │   └── vehicle_report.pdf
@@ -184,15 +210,15 @@ cd IoT-Vehicle-Tracking-Theft-Prevention-System
 python -m venv venv
 ```
 
-### Activate Environment
+### Activate Virtual Environment
 
-Windows
+#### Windows
 
 ```bash
 venv\Scripts\activate
 ```
 
-Linux / Mac
+#### Linux / macOS
 
 ```bash
 source venv/bin/activate
@@ -220,6 +246,8 @@ or
 python python_simulation/gps_simulator.py
 ```
 
+The simulator continuously generates GPS coordinates and sends them to ThingSpeak Cloud.
+
 ---
 
 ### Step 2: Launch Dashboard
@@ -228,7 +256,7 @@ python python_simulation/gps_simulator.py
 streamlit run dashboard.py
 ```
 
-Dashboard opens at:
+Dashboard URL:
 
 ```text
 http://localhost:8501
@@ -238,11 +266,9 @@ http://localhost:8501
 
 ## ☁ ThingSpeak Configuration
 
-Create a ThingSpeak Channel.
+Create a ThingSpeak channel and configure the following fields:
 
-Configure Fields:
-
-| Field   | Data           |
+| Field   | Description    |
 | ------- | -------------- |
 | Field 1 | Latitude       |
 | Field 2 | Longitude      |
@@ -250,19 +276,19 @@ Configure Fields:
 | Field 4 | Alert Type     |
 | Field 5 | Speed          |
 
-Update API Key:
+### Write API Key
 
 ```python
 WRITE_API_KEY = "YOUR_WRITE_API_KEY"
 ```
 
-Read API Key:
+### Read API Key
 
 ```python
 READ_API_KEY = "YOUR_READ_API_KEY"
 ```
 
-Channel ID:
+### Channel ID
 
 ```python
 CHANNEL_ID = "YOUR_CHANNEL_ID"
@@ -283,22 +309,25 @@ CHANNEL_ID = "YOUR_CHANNEL_ID"
 ### Live Map
 
 * Real-time vehicle position
-* Google Maps integration
+* Interactive Folium map
+* Google Maps redirection
 
 ### Analytics
 
-* Alert Statistics
-* Status Statistics
+* Alert statistics
+* Vehicle status statistics
 
 ### Vehicle History
 
-* Historical location records
+* Historical GPS records
 * Status logs
+* Location records
 
 ### Alert History
 
 * Theft alerts
 * Geofence alerts
+* Alert timeline
 
 ---
 
@@ -331,40 +360,55 @@ Normal     Alert Generated
 
 ## 📸 Project Screenshots
 
-### Dashboard Home
+### 🏠 Dashboard Home
 
-Add:
+![Dashboard Home](images/dashboard_home.png)
 
-```text
-images/dashboard_home.png
-```
+The main dashboard displays vehicle status, live telemetry, controls, and system health information.
 
-### Live Vehicle Tracking
+---
 
-Add:
+### 📍 Live Vehicle Tracking
 
-```text
-images/live_map.png
-```
+![Live Map](images/live_map.png)
 
-### Vehicle History
+Interactive Folium-based map showing the real-time vehicle position with Google Maps integration.
 
-Add:
+---
 
-```text
-images/history.png
-```
+### 📊 Analytics Dashboard
+
+![Analytics](images/analytics.png)
+
+Visual representation of alert statistics, vehicle status trends, and operational insights.
+
+---
+
+### 📜 Vehicle History
+
+![Vehicle History](images/vehicle_history.png)
+
+Historical vehicle records including timestamps, coordinates, status updates, and alerts.
+
+---
+
+### ☁ ThingSpeak Cloud Integration
+
+![ThingSpeak Dashboard](images/thingspeak_dashboard.png)
+
+Live IoT data transmission and monitoring through the ThingSpeak Cloud Platform.
 
 ---
 
 ## 📚 Applications
 
 * Fleet Management
-* Vehicle Security
-* Logistics Tracking
-* Asset Monitoring
+* Vehicle Security Systems
+* Logistics Monitoring
+* Asset Tracking
 * Smart Transportation
 * Industrial Vehicle Monitoring
+* Research & Academic Projects
 
 ---
 
@@ -375,8 +419,10 @@ images/history.png
 * GSM/SMS Alerts
 * Mobile Application
 * Firebase Integration
-* Machine Learning-Based Theft Prediction
+* MQTT Communication
+* Machine Learning Based Theft Prediction
 * Driver Behavior Analytics
+* Route Optimization
 
 ---
 
@@ -384,19 +430,22 @@ images/history.png
 
 ### Vayunandan Mishra
 
-B.Tech Student
-Internet of Things (IoT) Enthusiast
-Python Developer | Embedded Systems | Cloud IoT
+B.Tech Student | Internet of Things (IoT)
 
-GitHub:
+Passionate about IoT Systems, Embedded Development, Cloud Computing, Data Analytics, and Real-Time Monitoring Solutions.
 
-https://github.com/Vayu-143
+### Connect
+
+* GitHub: https://github.com/Vayu-143
+* Live Dashboard: https://iot-vehicle-tracking-theft-prevention-system-632ddnbtrfpp2pxfh.streamlit.app/
 
 ---
 
 ## 📜 License
 
 This project is developed for educational, academic, and research purposes.
+
+You may use, modify, and extend this project for learning and experimentation.
 
 ---
 
@@ -406,10 +455,14 @@ If you found this project useful:
 
 ⭐ Star the repository
 
-🍴 Fork the project
+🍴 Fork the repository
 
-📢 Share with others
+📢 Share it with others
+
+💡 Contribute improvements
 
 ---
 
-**Built with ❤️ using Python, Streamlit, ThingSpeak, and IoT Technologies**
+<p align="center">
+<b>Built with ❤️ using Python, Streamlit, ThingSpeak, and IoT Technologies</b>
+</p>
